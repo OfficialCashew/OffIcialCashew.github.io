@@ -6,27 +6,60 @@
     <title>About Me</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
-            text-align: center;
-            padding-top: 50px;
+            background-color: #1a1a1a;
+            color: #00ff41;
+            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.6;
+            padding: 20px;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
         }
         .container {
-            max-width: 800px;
-            margin: auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border: 2px solid #00ff41;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+        }
+        h1 {
+            color: #00ff41;
+            text-shadow: 0 0 5px #00ff41;
+        }
+        a {
+            color: #ff0077;
+            text-decoration: none;
+            border-bottom: 1px dashed #ff0077;
+            transition: color 0.3s;
+        }
+        a:hover {
+            color: #ffffff;
+            border-bottom-color: #ffffff;
+        }
+        audio {
+            margin-top: 20px;
+            width: 100%;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>About This Website</h1>
-        <p>This is a simple, two-page website made with just HTML.</p>
-        <a href="index.html">Back to Home</a>
+        <h1>[...about...]</h1>
+        <p>
+            Welcome to my personal corner of the web. This site is a project for me to learn more about hosting and the web.
+        </p>
+        <p>
+            You can find more of my work on my <a href="index.html">main page</a>.
+        </p>
+
+        <p>Now playing:</p>
+        <audio controls autoplay loop>
+            <source src="my-music.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
     </div>
 </body>
 </html>
