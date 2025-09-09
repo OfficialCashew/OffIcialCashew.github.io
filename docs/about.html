@@ -118,24 +118,22 @@
             font-weight: bold;
             text-shadow: 0 0 10px rgba(80, 227, 194, 0.5);
         }
-
+        
         .music-symbol {
             font-size: 3em;
             color: var(--secondary-color);
-            display: block;
+            display: inline-block;
             margin-bottom: 20px;
             animation: bounce 1s infinite alternate;
-            transition: opacity 0.5s ease-out;
         }
-        
+
         @keyframes bounce {
             0% { transform: scale(1); opacity: 0.8; }
             100% { transform: scale(1.1); opacity: 1; }
         }
 
         .hidden {
-            opacity: 0;
-            pointer-events: none;
+            display: none;
         }
 
         .button-link {
@@ -224,7 +222,7 @@
         <div class="volume-toggle" id="volumeToggle">
             <i class="fas fa-volume-up"></i>
         </div>
-        <audio id="backgroundMusic" src="music/theneite.mp3" loop autoplay></audio>
+        <audio id="backgroundMusic" src="music/Alex-Warren-Ordinary.mp3" loop autoplay></audio>
     </div>
 
     <main class="main-content">
@@ -305,38 +303,37 @@
             { time: 138.0, text: "The angels up in the clouds are jealous knowin' we found" },
         ];
 
-        // Dynamically create lyric elements, but don't append to lyrics container yet
-        const lyricElements = lyrics.map((line, index) => {
+        // Dynamically create lyric elements and append them to the container
+        lyrics.forEach((line, index) => {
             const p = document.createElement('p');
             p.textContent = line.text;
             p.classList.add('lyrics-line');
             p.dataset.time = line.time;
             p.dataset.index = index;
-            return p;
+            lyricsContainer.appendChild(p);
         });
-        
+
         const lyricsLines = document.querySelectorAll('.lyrics-line');
         let currentLyricIndex = -1;
-        let isIntroComplete = false;
+        let isIntroActive = true;
 
         backgroundMusic.addEventListener('timeupdate', () => {
             const currentTime = backgroundMusic.currentTime;
             
             if (currentTime < 8.0) {
                 // Intro phase: highlight the symbol
-                introSymbol.classList.remove('hidden');
-                // Ensure lyrics are not shown
-                lyricsContainer.classList.add('hidden');
-            } else {
-                // Transition from intro to lyrics
-                if (!isIntroComplete) {
-                    introSymbol.classList.add('hidden');
-                    lyricsContainer.classList.remove('hidden');
-                    // Append all lyric elements at once
-                    lyricElements.forEach(el => lyricsContainer.appendChild(el));
-                    isIntroComplete = true;
+                introSymbol.classList.add('highlight');
+                // Ensure no lyrics are highlighted during intro
+                if (currentLyricIndex !== -1) {
+                    lyricsLines[currentLyricIndex].classList.remove('highlight');
+                    currentLyricIndex = -1;
                 }
-                
+            } else if (isIntroActive) {
+                // Transition phase: remove symbol highlight and start lyric highlight
+                introSymbol.classList.remove('highlight');
+                introSymbol.classList.add('hidden');
+                isIntroActive = false;
+            } else {
                 // Normal lyric highlighting
                 let foundIndex = -1;
                 for (let i = 0; i < lyrics.length; i++) {
@@ -347,13 +344,13 @@
 
                 if (foundIndex !== -1 && foundIndex !== currentLyricIndex) {
                     if (currentLyricIndex !== -1) {
-                        lyricElements[currentLyricIndex].classList.remove('highlight');
+                        lyricsLines[currentLyricIndex].classList.remove('highlight');
                     }
                     
-                    lyricElements[foundIndex].classList.add('highlight');
+                    lyricsLines[foundIndex].classList.add('highlight');
                     currentLyricIndex = foundIndex;
 
-                    lyricElements[foundIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    lyricsLines[foundIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }
         });
