@@ -6,7 +6,7 @@
     <title>About Me - Revamped</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@300;400;300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
@@ -118,17 +118,22 @@
             font-weight: bold;
             text-shadow: 0 0 10px rgba(80, 227, 194, 0.5);
         }
-
-        .music-symbol {
-            display: inline-block;
-            font-size: 1.2em;
-            margin: 0 5px;
-            animation: pulse 1.5s infinite alternate;
-        }
         
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.5; }
-            100% { transform: scale(1.2); opacity: 1; }
+        .intro-symbol {
+            font-size: 3em;
+            color: var(--secondary-color);
+            display: block;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite alternate;
+        }
+
+        @keyframes bounce {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .hidden {
+            display: none;
         }
 
         .button-link {
@@ -217,7 +222,7 @@
         <div class="volume-toggle" id="volumeToggle">
             <i class="fas fa-volume-up"></i>
         </div>
-        <audio id="backgroundMusic" src="music/Alex-Warren-Ordinary.mp3" loop autoplay></audio>
+        <audio id="backgroundMusic" src="music/theneite.mp3" loop autoplay></audio>
     </div>
 
     <main class="main-content">
@@ -233,7 +238,10 @@
 
         <div class="container">
             <h2 id="songTitleDisplay">Out of the Ordinary - Alex Warren</h2>
-            <div id="lyrics-container" class="lyrics-section"></div>
+            <div id="introSymbolContainer">
+                <span class="intro-symbol">♪</span>
+            </div>
+            <div id="lyrics-container" class="lyrics-section hidden"></div>
         </div>
     </main>
     
@@ -247,11 +255,12 @@
         const volumeIcon = volumeToggle.querySelector('i');
         const scrollTopBtn = document.getElementById("scrollTopBtn");
         const lyricsContainer = document.getElementById('lyrics-container');
+        const introSymbolContainer = document.getElementById('introSymbolContainer');
 
         const lyrics = [
-            { time: 1.3, text: "♪ They say, \"The holy water's watered down" },
-            { time: 3.5, text: "♪ And this town's lost its faith" },
-            { time: 6.0, text: "♪ Our colors will fade eventually\"" },
+            { time: 1.3, text: "They say, \"The holy water's watered down" },
+            { time: 3.5, text: "And this town's lost its faith" },
+            { time: 6.0, text: "Our colors will fade eventually\"" },
             { time: 8.5, text: "So, if our time is runnin' out" },
             { time: 11.0, text: "Day after day" },
             { time: 13.0, text: "We'll make the mundane our masterpiece" },
@@ -309,23 +318,31 @@
 
         backgroundMusic.addEventListener('timeupdate', () => {
             const currentTime = backgroundMusic.currentTime;
-            let foundIndex = -1;
-
-            for (let i = 0; i < lyrics.length; i++) {
-                if (currentTime >= lyrics[i].time) {
-                    foundIndex = i;
-                }
-            }
-
-            if (foundIndex !== -1 && foundIndex !== currentLyricIndex) {
-                if (currentLyricIndex !== -1) {
-                    lyricsLines[currentLyricIndex].classList.remove('highlight');
+            
+            if (currentTime >= 8.0) {
+                // After 8 seconds, hide the intro symbol and show lyrics
+                if (!lyricsContainer.classList.contains('hidden')) {
+                    introSymbolContainer.classList.add('hidden');
+                    lyricsContainer.classList.remove('hidden');
                 }
                 
-                lyricsLines[foundIndex].classList.add('highlight');
-                currentLyricIndex = foundIndex;
+                let foundIndex = -1;
+                for (let i = 0; i < lyrics.length; i++) {
+                    if (currentTime >= lyrics[i].time) {
+                        foundIndex = i;
+                    }
+                }
 
-                lyricsLines[foundIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (foundIndex !== -1 && foundIndex !== currentLyricIndex) {
+                    if (currentLyricIndex !== -1) {
+                        lyricsLines[currentLyricIndex].classList.remove('highlight');
+                    }
+                    
+                    lyricsLines[foundIndex].classList.add('highlight');
+                    currentLyricIndex = foundIndex;
+
+                    lyricsLines[foundIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
             }
         });
 
