@@ -102,7 +102,7 @@
 
         .music-bar {
             background-color: #444;
-            height: 120px; /* Increased height to fit the visualizer */
+            height: 120px;
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -111,6 +111,7 @@
             padding: 10px 20px;
             margin-bottom: 20px;
             animation: pulse-bar 1.5s infinite alternate;
+            position: relative;
         }
         
         @keyframes pulse-bar {
@@ -124,6 +125,7 @@
             background-color: #555;
             border-radius: 5px;
             margin-top: 10px;
+            z-index: 2;
         }
 
         .progress-bar {
@@ -135,13 +137,34 @@
         }
 
         .visualizer-container {
-            width: 100%;
-            height: 50px;
-            margin-top: 10px;
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            border-radius: 50%;
+            overflow: hidden;
+            background-color: transparent;
         }
+
         canvas {
+            display: block;
             width: 100%;
             height: 100%;
+            background-color: transparent;
+        }
+        .canvas-name {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.2em;
+            color: var(--light-text);
+            z-index: 3;
+            pointer-events: none;
         }
 
         .button-link {
@@ -164,11 +187,39 @@
             background: linear-gradient(90deg, var(--secondary-color) 0%, var(--primary-color) 100%);
         }
 
-        .audio-controls {
+        .top-right-controls {
             position: fixed;
             top: 20px;
-            left: 20px;
+            right: 20px;
             z-index: 1000;
+            display: flex;
+            gap: 15px; /* Add some space between buttons */
+        }
+        
+        .play-pause-toggle {
+            background-color: var(--card-bg);
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .play-pause-toggle:hover {
+            transform: scale(1.1);
+            border-color: var(--secondary-color);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .play-pause-toggle i {
+            color: var(--light-text);
+            font-size: 1.5em;
+            transition: color 0.3s;
         }
 
         .volume-toggle {
@@ -293,29 +344,34 @@
                 padding: 12px 24px;
                 font-size: 1em;
             }
-            .audio-controls {
+            .top-right-controls {
                 top: auto;
+                right: auto;
                 bottom: 20px;
                 left: 50%;
                 transform: translateX(-50%);
-                display: flex;
-                align-items: center;
+                flex-direction: row;
+                gap: 10px;
             }
             .volume-toggle {
                 width: 45px;
                 height: 45px;
             }
             .music-bar {
-                height: 50px;
+                height: 200px;
                 padding: 8px 15px;
             }
             .music-bar h2 {
                 font-size: 1.5em;
             }
             .logo {
-                width: 60px; /* Adjust for smaller screens */
+                width: 60px;
                 top: 15px;
                 left: 15px;
+            }
+            .visualizer-container {
+                width: 150px;
+                height: 150px;
             }
         }
     </style>
@@ -329,13 +385,13 @@
         </button>
     </div>
 
-    <div class="audio-controls">
+    <div class="top-right-controls">
         <div class="volume-toggle" id="volumeToggle">
             <i class="fas fa-volume-up"></i>
         </div>
-        <audio id="backgroundMusic" src="music/Alex-Warren-Ordinary.mp3" loop></audio>
     </div>
-
+    
+    <audio id="backgroundMusic" src="music/Alex-Warren-Ordinary.mp3" loop></audio>
     <img src="images/Lucky and Clover 💖.png" alt="Lucky and Clover Logo" class="logo">
 
     <main class="main-content">
@@ -361,6 +417,7 @@
                 </div>
                 <div class="visualizer-container">
                     <canvas id="visualizerCanvas"></canvas>
+                    <div class="canvas-name">Lucky and Clover</div>
                 </div>
             </div>
         </div>
@@ -375,22 +432,23 @@
         const splashPage = document.getElementById('splashPage');
         const splashButton = document.getElementById('splashButton');
         const mainContent = document.querySelector('.main-content');
+        const playPauseToggle = document.getElementById('playPauseToggle');
         const volumeToggle = document.getElementById('volumeToggle');
         const volumeIcon = volumeToggle.querySelector('i');
         const progressBar = document.getElementById('progressBar');
         const scrollTopBtn = document.getElementById("scrollTopBtn");
-
-        // Visualizer setup
         const canvas = document.getElementById('visualizerCanvas');
         const ctx = canvas.getContext('2d');
+        const canvasName = document.querySelector('.canvas-name');
+
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
 
         let audioContext;
         let analyser;
         let source;
         let bufferLength;
         let dataArray;
-        let barWidth;
-        let x;
 
         function setupVisualizer() {
             if (!audioContext) {
@@ -409,19 +467,28 @@
             requestAnimationFrame(drawVisualizer);
             analyser.getByteFrequencyData(dataArray);
 
-            ctx.fillStyle = '#1a202c';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            barWidth = (canvas.width / bufferLength) * 2.5;
-            x = 0;
+            let centerX = canvas.width / 2;
+            let centerY = canvas.height / 2;
+            let baseRadius = Math.min(centerX, centerY) * 0.2;
 
             for (let i = 0; i < bufferLength; i++) {
-                let barHeight = dataArray[i] * 0.5;
+                let barHeight = dataArray[i] / 2;
+                let angle = i * Math.PI * 2 / bufferLength;
 
-                let hue = i * 2;
-                ctx.fillStyle = 'hsl(' + hue + ', 100%, 50%)';
-                ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-                x += barWidth + 1;
+                let x1 = centerX;
+                let y1 = centerY;
+                let x2 = centerX + (baseRadius + barHeight) * Math.cos(angle);
+                let y2 = centerY + (baseRadius + barHeight) * Math.sin(angle);
+
+                let hue = (i / bufferLength) * 360;
+                ctx.strokeStyle = 'hsl(' + hue + ', 100%, 70%)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
             }
         }
 
@@ -485,6 +552,15 @@
             document.body.scrollTop = 0;
             document.documentElement.scrollTop = 0;
         }
+
+        // Adjust canvas size on window resize
+        window.addEventListener('resize', () => {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            if (backgroundMusic.paused === false) {
+                drawVisualizer();
+            }
+        });
     </script>
 </body>
 </html>
