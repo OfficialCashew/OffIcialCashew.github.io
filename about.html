@@ -25,10 +25,7 @@
             background: linear-gradient(135deg, var(--dark-bg) 0%, #2a3447 100%);
             color: var(--light-text);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
+            overflow-x: hidden;
             position: relative;
         }
 
@@ -50,6 +47,13 @@
             100% { background-position: 100% 100%, 0% 0%; }
         }
 
+        .main-content {
+            padding: 50px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         .container {
             background-color: var(--card-bg);
             padding: 50px;
@@ -58,6 +62,7 @@
             text-align: center;
             max-width: 700px;
             width: 90%;
+            margin-bottom: 40px;
             opacity: 0;
             transform: translateY(20px);
             animation: fadeIn 1s forwards ease-out;
@@ -72,7 +77,7 @@
             }
         }
 
-        h1 {
+        h1, h2 {
             font-family: 'Montserrat', sans-serif;
             color: var(--primary-color);
             font-weight: 700;
@@ -81,12 +86,24 @@
             letter-spacing: 1px;
             text-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
         }
+        
+        h2 {
+            font-size: 2em;
+        }
 
         p {
             font-size: 1.2em;
             line-height: 1.8;
             margin-bottom: 30px;
             color: var(--light-text);
+        }
+        
+        .lyrics-section p {
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            font-size: 1em;
+            color: #b0bec5;
         }
 
         .button-link {
@@ -109,7 +126,6 @@
             background: linear-gradient(90deg, var(--secondary-color) 0%, var(--primary-color) 100%);
         }
 
-        /* Audio control styling */
         .audio-controls {
             position: fixed;
             top: 20px;
@@ -144,7 +160,30 @@
         }
 
         .volume-toggle.muted i {
-            color: var(--accent-color); /* Change color when muted */
+            color: var(--accent-color);
+        }
+        
+        .scroll-top-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5em;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            display: none;
+            z-index: 999;
+        }
+        
+        .scroll-top-button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-3px);
         }
     </style>
 </head>
@@ -156,22 +195,63 @@
         <audio id="backgroundMusic" src="my-music.mp3" loop autoplay></audio>
     </div>
 
-    <div class="container">
-        <h1>Unveiling My Story</h1>
-        <p>
-            Welcome to the 'About' section, where I share insights into my journey and passion for web development. Every line of code, every design choice, reflects a commitment to innovation and excellence.
-        </p>
-        <p>
-            Explore my roots on the <a href="index.html" class="button-link">Homepage</a>.
-        </p>
-    </div>
+    <main class="main-content">
+        <div class="container">
+            <h1>About Me</h1>
+            <p>
+                Welcome to the 'About' section, where I share insights into my journey and passion for web development.
+            </p>
+            <p>
+                Explore my roots on the <a href="index.html" class="button-link">Homepage</a>.
+            </p>
+        </div>
+
+        <div class="container lyrics-section">
+            <h2 id="songTitleDisplay"></h2>
+            <p id="lyricsDisplay"></p>
+        </div>
+    </main>
+    
+    <button onclick="topFunction()" id="scrollTopBtn" class="scroll-top-button" title="Go to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
     <script>
         const backgroundMusic = document.getElementById('backgroundMusic');
         const volumeToggle = document.getElementById('volumeToggle');
         const volumeIcon = volumeToggle.querySelector('i');
+        const scrollTopBtn = document.getElementById("scrollTopBtn");
 
-        // Check local storage for last volume state
+        // YOUR SONG DATA GOES HERE
+        const songs = {
+            'My Song': `
+                (Verse 1)
+                The sun shines down, a brand new day,
+                A world of code, to light my way.
+                The screens all glow, a digital dream,
+                Building my future, on a flowing stream.
+
+                (Chorus)
+                GitHub Pages, a perfect stage,
+                To tell my story, on this digital page.
+                With every line, a new design,
+                This web I weave, forever mine.
+            `,
+            'Another Song': `
+                (Verse 1)
+                This is another song, a different vibe,
+                Just some simple words for a new tribe.
+                The notes all fall, in a perfect line,
+                Hope you like this little design.
+            `
+        };
+
+        let currentSongTitle = 'My Song'; // CHANGE THIS TO THE SONG YOU WANT TO DISPLAY
+        
+        document.getElementById('songTitleDisplay').innerText = currentSongTitle;
+        document.getElementById('lyricsDisplay').innerText = songs[currentSongTitle];
+
+        // Volume control logic
         const isMuted = localStorage.getItem('isMuted') === 'true';
         if (isMuted) {
             backgroundMusic.muted = true;
@@ -179,14 +259,10 @@
             volumeIcon.classList.remove('fa-volume-up');
             volumeIcon.classList.add('fa-volume-mute');
         } else {
-             // Play on load, but browsers often block autoplay without user interaction.
-             // We'll try to play, and if it fails, rely on user interaction.
             backgroundMusic.play().catch(e => {
                 console.log("Autoplay blocked, user interaction needed to play music.");
-                // Optionally, show a "Play Music" button if autoplay fails
             });
         }
-
         volumeToggle.addEventListener('click', () => {
             backgroundMusic.muted = !backgroundMusic.muted;
             if (backgroundMusic.muted) {
@@ -195,15 +271,13 @@
                 volumeIcon.classList.add('fa-volume-mute');
                 localStorage.setItem('isMuted', 'true');
             } else {
-                backgroundMusic.play(); // Try to play if unmuted
+                backgroundMusic.play();
                 volumeToggle.classList.remove('muted');
                 volumeIcon.classList.remove('fa-volume-mute');
                 volumeIcon.classList.add('fa-volume-up');
                 localStorage.setItem('isMuted', 'false');
             }
         });
-
-        // For browsers that block autoplay, allow play when user interacts with anything
         document.addEventListener('DOMContentLoaded', () => {
             document.body.addEventListener('click', () => {
                 if (!backgroundMusic.muted && backgroundMusic.paused) {
@@ -211,6 +285,20 @@
                 }
             }, { once: true });
         });
+        
+        // Scroll to top button logic
+        window.onscroll = function() {scrollFunction()};
+        function scrollFunction() {
+            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                scrollTopBtn.style.display = "block";
+            } else {
+                scrollTopBtn.style.display = "none";
+            }
+        }
+        function topFunction() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
     </script>
 </body>
 </html>
