@@ -4,40 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Me</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            background-color: #1a1a1a;
-            color: #00ff41;
-            font-family: 'Courier New', Courier, monospace;
-            line-height: 1.6;
-            padding: 20px;
+            font-family: 'Poppins', sans-serif;
             margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            padding: 0;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            color: #333;
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .container {
-            border: 2px solid #00ff41;
-            padding: 30px;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
             max-width: 600px;
-            width: 100%;
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+            width: 90%;
+            transition: transform 0.3s ease-in-out;
+        }
+        .container:hover {
+            transform: translateY(-5px);
         }
         h1 {
-            color: #00ff41;
-            text-shadow: 0 0 5px #00ff41;
+            color: #0d47a1;
+            font-weight: 600;
+        }
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 25px;
         }
         a {
-            color: #ff0077;
+            background-color: #0d47a1;
+            color: #ffffff;
+            padding: 12px 24px;
             text-decoration: none;
-            border-bottom: 1px dashed #ff0077;
-            transition: color 0.3s;
+            border-radius: 6px;
+            transition: background-color 0.3s;
         }
         a:hover {
-            color: #ffffff;
-            border-bottom-color: #ffffff;
+            background-color: #1565c0;
         }
         audio {
             margin-top: 20px;
@@ -47,12 +60,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>[...about...]</h1>
+        <h1>About Me</h1>
+        <p>This is a simple, two-page website built with a clean, modern design.</p>
         <p>
-            Welcome to my personal corner of the web. This site is a project for me to learn more about hosting and the web.
-        </p>
-        <p>
-            You can find more of my work on my <a href="index.html">main page</a>.
+            You can find my main page <a href="index.html">here</a>.
         </p>
 
         <p>Now playing:</p>
