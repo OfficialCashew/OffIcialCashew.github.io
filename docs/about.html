@@ -365,7 +365,7 @@
         const volumeToggle = document.getElementById('volumeToggle');
         const volumeIcon = volumeToggle.querySelector('i');
         const progressBar = document.getElementById('progressBar');
-        const scrollTopBtn = document="getElementById("scrollTopBtn");
+        const scrollTopBtn = document.getElementById("scrollTopBtn");
 
         // Volume logic, pre-load state
         const isMuted = localStorage.getItem('isMuted') === 'true';
@@ -403,11 +403,6 @@
         backgroundMusic.addEventListener('timeupdate', () => {
             const progress = (backgroundMusic.currentTime / backgroundMusic.duration) * 100;
             progressBar.style.width = progress + '%';
-        });
-
-        // Hide splash page if audio is already playing (for browser reloads with audio already playing)
-        backgroundMusic.addEventListener('playing', () => {
-            splashPage.classList.add('fade-out');
         });
         
         // Scroll to top button logic
