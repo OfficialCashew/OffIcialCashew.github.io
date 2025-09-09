@@ -131,7 +131,7 @@
             0% { transform: scale(1); opacity: 0.8; }
             100% { transform: scale(1.1); opacity: 1; }
         }
-        
+
         .hidden {
             display: none;
         }
@@ -222,7 +222,7 @@
         <div class="volume-toggle" id="volumeToggle">
             <i class="fas fa-volume-up"></i>
         </div>
-        <audio id="backgroundMusic" src="music/Alex-Warren-Ordinary.mp3" loop autoplay></audio>
+        <audio id="backgroundMusic" src="music/Alex-Warrem-Odinary.mp3" loop autoplay></audio>
     </div>
 
     <main class="main-content">
@@ -315,19 +315,21 @@
 
         const lyricsLines = document.querySelectorAll('.lyrics-line');
         let currentLyricIndex = -1;
+        let isIntroComplete = false;
 
         backgroundMusic.addEventListener('timeupdate', () => {
             const currentTime = backgroundMusic.currentTime;
             
-            // Highlight the symbol for the first 8 seconds
+            // For the first 8 seconds, only highlight the symbol
             if (currentTime < 8.0) {
                 introSymbol.classList.add('highlight');
             } else {
-                introSymbol.classList.remove('highlight');
-            }
+                // After 8 seconds, stop highlighting the symbol
+                if (introSymbol.classList.contains('highlight')) {
+                    introSymbol.classList.remove('highlight');
+                }
 
-            // Begin regular lyric highlighting after 8 seconds
-            if (currentTime >= 8.0) {
+                // Begin regular lyric highlighting
                 let foundIndex = -1;
                 for (let i = 0; i < lyrics.length; i++) {
                     if (currentTime >= lyrics[i].time) {
