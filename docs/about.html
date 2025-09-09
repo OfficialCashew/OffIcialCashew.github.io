@@ -107,7 +107,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0 20px;
+            flex-direction: column;
+            padding: 10px 20px;
             margin-bottom: 20px;
             animation: pulse-bar 1.5s infinite alternate;
         }
@@ -115,6 +116,22 @@
         @keyframes pulse-bar {
             0% { box-shadow: 0 0 10px rgba(80, 227, 194, 0.3); }
             100% { box-shadow: 0 0 20px rgba(80, 227, 194, 0.6); }
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 5px;
+            background-color: #555;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--secondary-color);
+            border-radius: 5px;
+            transition: width 0.1s linear;
         }
 
         .button-link {
@@ -250,6 +267,9 @@
         <div class="container">
             <div class="music-bar">
                 <h2>Alex Warren - Ordinary</h2>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
             </div>
         </div>
     </main>
@@ -264,6 +284,7 @@
         const playPauseIcon = playPauseToggle.querySelector('i');
         const volumeToggle = document.getElementById('volumeToggle');
         const volumeIcon = volumeToggle.querySelector('i');
+        const progressBar = document.getElementById('progressBar');
         const scrollTopBtn = document.getElementById("scrollTopBtn");
 
         // Autoplay logic
@@ -307,6 +328,12 @@
                 volumeIcon.classList.add('fa-volume-up');
                 localStorage.setItem('isMuted', 'false');
             }
+        });
+
+        // Progress bar logic
+        backgroundMusic.addEventListener('timeupdate', () => {
+            const progress = (backgroundMusic.currentTime / backgroundMusic.duration) * 100;
+            progressBar.style.width = progress + '%';
         });
 
         document.addEventListener('DOMContentLoaded', () => {
