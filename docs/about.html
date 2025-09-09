@@ -102,7 +102,7 @@
 
         .music-bar {
             background-color: #444;
-            height: 60px;
+            height: 120px; /* Increased height to fit the visualizer */
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -132,6 +132,16 @@
             background-color: var(--secondary-color);
             border-radius: 5px;
             transition: width 0.1s linear;
+        }
+
+        .visualizer-container {
+            width: 100%;
+            height: 50px;
+            margin-top: 10px;
+        }
+        canvas {
+            width: 100%;
+            height: 100%;
         }
 
         .button-link {
@@ -257,6 +267,17 @@
             pointer-events: none;
         }
 
+        /* LOGO STYLES */
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 80px; /* Adjust as needed */
+            height: auto;
+            z-index: 20;
+            transition: transform 0.3s ease;
+        }
+
         /* MOBILE OPTIMIZATIONS */
         @media (max-width: 768px) {
             h1 {
@@ -291,6 +312,11 @@
             .music-bar h2 {
                 font-size: 1.5em;
             }
+            .logo {
+                width: 60px; /* Adjust for smaller screens */
+                top: 15px;
+                left: 15px;
+            }
         }
     </style>
 </head>
@@ -309,6 +335,8 @@
         </div>
         <audio id="backgroundMusic" src="music/Alex-Warren-Ordinary.mp3" loop></audio>
     </div>
+
+    <img src="images/Lucky and Clover 💖.png" alt="Lucky and Clover Logo" class="logo">
 
     <main class="main-content">
         <div class="container">
@@ -331,6 +359,9 @@
                 <div class="progress-container">
                     <div class="progress-bar" id="progressBar"></div>
                 </div>
+                <div class="visualizer-container">
+                    <canvas id="visualizerCanvas"></canvas>
+                </div>
             </div>
         </div>
     </main>
@@ -349,6 +380,51 @@
         const progressBar = document.getElementById('progressBar');
         const scrollTopBtn = document.getElementById("scrollTopBtn");
 
+        // Visualizer setup
+        const canvas = document.getElementById('visualizerCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let audioContext;
+        let analyser;
+        let source;
+        let bufferLength;
+        let dataArray;
+        let barWidth;
+        let x;
+
+        function setupVisualizer() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                source = audioContext.createMediaElementSource(backgroundMusic);
+                source.connect(analyser);
+                analyser.connect(audioContext.destination);
+                analyser.fftSize = 256;
+                bufferLength = analyser.frequencyBinCount;
+                dataArray = new Uint8Array(bufferLength);
+            }
+        }
+
+        function drawVisualizer() {
+            requestAnimationFrame(drawVisualizer);
+            analyser.getByteFrequencyData(dataArray);
+
+            ctx.fillStyle = '#1a202c';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            barWidth = (canvas.width / bufferLength) * 2.5;
+            x = 0;
+
+            for (let i = 0; i < bufferLength; i++) {
+                let barHeight = dataArray[i] * 0.5;
+
+                let hue = i * 2;
+                ctx.fillStyle = 'hsl(' + hue + ', 100%, 50%)';
+                ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+                x += barWidth + 1;
+            }
+        }
+
         // Volume logic, pre-load state
         const isMuted = localStorage.getItem('isMuted') === 'true';
         if (isMuted) {
@@ -361,7 +437,9 @@
         // Splash screen and autoplay on click
         splashButton.addEventListener('click', () => {
             splashPage.classList.add('fade-out');
+            setupVisualizer();
             backgroundMusic.play().catch(e => console.log("Audio playback failed:", e));
+            drawVisualizer();
         });
 
         // Volume button logic
@@ -390,6 +468,8 @@
         // Hide splash page if audio is already playing (for browser reloads with audio already playing)
         backgroundMusic.addEventListener('playing', () => {
             splashPage.classList.add('fade-out');
+            setupVisualizer();
+            drawVisualizer();
         });
         
         // Scroll to top button logic
