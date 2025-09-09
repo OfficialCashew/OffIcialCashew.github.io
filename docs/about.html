@@ -257,17 +257,6 @@
             pointer-events: none;
         }
 
-        /* LOGO STYLES */
-        .logo {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            width: 80px; /* Adjust as needed */
-            height: auto;
-            z-index: 20;
-            transition: transform 0.3s ease;
-        }
-
         /* MOBILE OPTIMIZATIONS */
         @media (max-width: 768px) {
             h1 {
@@ -302,11 +291,6 @@
             .music-bar h2 {
                 font-size: 1.5em;
             }
-            .logo {
-                width: 60px; /* Adjust for smaller screens */
-                top: 15px;
-                left: 15px;
-            }
         }
     </style>
 </head>
@@ -325,8 +309,6 @@
         </div>
         <audio id="backgroundMusic" src="music/Alex-Warren-Ordinary.mp3" loop></audio>
     </div>
-
-    <img src="images/Lucky and Clover 💖.png" alt="Lucky and Clover Logo" class="logo">
 
     <main class="main-content">
         <div class="container">
@@ -403,6 +385,11 @@
         backgroundMusic.addEventListener('timeupdate', () => {
             const progress = (backgroundMusic.currentTime / backgroundMusic.duration) * 100;
             progressBar.style.width = progress + '%';
+        });
+
+        // Hide splash page if audio is already playing (for browser reloads with audio already playing)
+        backgroundMusic.addEventListener('playing', () => {
+            splashPage.classList.add('fade-out');
         });
         
         // Scroll to top button logic
