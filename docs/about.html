@@ -102,7 +102,7 @@
 
         .music-bar {
             background-color: #444;
-            height: 250px; /* Increased height to accommodate the larger visualizer */
+            height: 120px; /* Increased height to fit the visualizer */
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -111,7 +111,6 @@
             padding: 10px 20px;
             margin-bottom: 20px;
             animation: pulse-bar 1.5s infinite alternate;
-            position: relative; /* Needed for absolute positioning of canvas */
         }
         
         @keyframes pulse-bar {
@@ -125,7 +124,6 @@
             background-color: #555;
             border-radius: 5px;
             margin-top: 10px;
-            z-index: 2; /* Ensure progress bar is above canvas if needed */
         }
 
         .progress-bar {
@@ -137,23 +135,13 @@
         }
 
         .visualizer-container {
-            position: absolute;
-            width: 200px; /* Fixed size for the circular visualizer */
-            height: 200px; /* Fixed size for the circular visualizer */
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1; /* Keep it behind text and progress */
-            border-radius: 50%; /* Make the container circular */
-            overflow: hidden; /* Hide parts of canvas outside the circle */
-            background-color: transparent; /* Make sure the container itself is transparent */
+            width: 100%;
+            height: 50px;
+            margin-top: 10px;
         }
-
         canvas {
-            display: block;
             width: 100%;
             height: 100%;
-            background-color: transparent; /* Canvas background should be transparent */
         }
 
         .button-link {
@@ -318,7 +306,7 @@
                 height: 45px;
             }
             .music-bar {
-                height: 200px; /* Adjusted height for mobile visualizer */
+                height: 50px;
                 padding: 8px 15px;
             }
             .music-bar h2 {
@@ -328,10 +316,6 @@
                 width: 60px; /* Adjust for smaller screens */
                 top: 15px;
                 left: 15px;
-            }
-            .visualizer-container {
-                width: 150px;
-                height: 150px;
             }
         }
     </style>
@@ -395,18 +379,18 @@
         const volumeIcon = volumeToggle.querySelector('i');
         const progressBar = document.getElementById('progressBar');
         const scrollTopBtn = document.getElementById("scrollTopBtn");
+
+        // Visualizer setup
         const canvas = document.getElementById('visualizerCanvas');
         const ctx = canvas.getContext('2d');
-
-        // Set canvas dimensions explicitly for drawing
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
 
         let audioContext;
         let analyser;
         let source;
         let bufferLength;
         let dataArray;
+        let barWidth;
+        let x;
 
         function setupVisualizer() {
             if (!audioContext) {
@@ -415,7 +399,7 @@
                 source = audioContext.createMediaElementSource(backgroundMusic);
                 source.connect(analyser);
                 analyser.connect(audioContext.destination);
-                analyser.fftSize = 256; // You can adjust this for more or less detail (must be power of 2)
+                analyser.fftSize = 256;
                 bufferLength = analyser.frequencyBinCount;
                 dataArray = new Uint8Array(bufferLength);
             }
@@ -425,42 +409,20 @@
             requestAnimationFrame(drawVisualizer);
             analyser.getByteFrequencyData(dataArray);
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear only the canvas
+            ctx.fillStyle = '#1a202c';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            let centerX = canvas.width / 2;
-            let centerY = canvas.height / 2;
-            let baseRadius = Math.min(centerX, centerY) * 0.2; // Base radius for the circle
+            barWidth = (canvas.width / bufferLength) * 2.5;
+            x = 0;
 
-            // Draw the pulsing lines from the center
             for (let i = 0; i < bufferLength; i++) {
-                let barHeight = dataArray[i] * 0.5; // Scale the height
-                let angle = i * Math.PI * 2 / bufferLength;
+                let barHeight = dataArray[i] * 0.5;
 
-                let x1 = centerX;
-                let y1 = centerY;
-                let x2 = centerX + (baseRadius + barHeight) * Math.cos(angle);
-                let y2 = centerY + (baseRadius + barHeight) * Math.sin(angle);
-
-                let hue = (i / bufferLength) * 360;
-                ctx.strokeStyle = 'hsl(' + hue + ', 100%, 70%)'; // Lighter color for visibility
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(x1, y1);
-                ctx.lineTo(x2, y2);
-                ctx.stroke();
+                let hue = i * 2;
+                ctx.fillStyle = 'hsl(' + hue + ', 100%, 50%)';
+                ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+                x += barWidth + 1;
             }
-
-            // Draw the "Lucky and Clover" text in the center
-            ctx.font = 'bold 24px "Montserrat", sans-serif'; // Adjust font size and family
-            ctx.fillStyle = var_to_css_value('--light-text'); // Use your light text color
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('Lucky and Clover', centerX, centerY);
-        }
-
-        // Helper function to get CSS variable value (since direct access to --light-text in canvas is not straightforward)
-        function var_to_css_value(variable) {
-            return getComputedStyle(document.documentElement).getPropertyValue(variable);
         }
 
         // Volume logic, pre-load state
@@ -523,15 +485,6 @@
             document.body.scrollTop = 0;
             document.documentElement.scrollTop = 0;
         }
-
-        // Adjust canvas size on window resize
-        window.addEventListener('resize', () => {
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-            if (backgroundMusic.paused === false) { // Redraw if music is playing
-                drawVisualizer();
-            }
-        });
     </script>
 </body>
 </html>
