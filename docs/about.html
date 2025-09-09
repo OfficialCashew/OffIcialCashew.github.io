@@ -102,7 +102,7 @@
 
         .music-bar {
             background-color: #444;
-            height: 120px; /* Increased height to fit the visualizer */
+            height: 120px;
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -379,8 +379,6 @@
         const volumeIcon = volumeToggle.querySelector('i');
         const progressBar = document.getElementById('progressBar');
         const scrollTopBtn = document.getElementById("scrollTopBtn");
-
-        // Visualizer setup
         const canvas = document.getElementById('visualizerCanvas');
         const ctx = canvas.getContext('2d');
 
@@ -389,8 +387,6 @@
         let source;
         let bufferLength;
         let dataArray;
-        let barWidth;
-        let x;
 
         function setupVisualizer() {
             if (!audioContext) {
@@ -412,16 +408,26 @@
             ctx.fillStyle = '#1a202c';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            barWidth = (canvas.width / bufferLength) * 2.5;
-            x = 0;
+            let centerX = canvas.width / 2;
+            let centerY = canvas.height / 2;
+            let radius = Math.min(centerX, centerY) * 0.4;
 
             for (let i = 0; i < bufferLength; i++) {
-                let barHeight = dataArray[i] * 0.5;
+                let barHeight = dataArray[i] / 2;
+                let angle = i * Math.PI * 2 / bufferLength;
 
-                let hue = i * 2;
-                ctx.fillStyle = 'hsl(' + hue + ', 100%, 50%)';
-                ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-                x += barWidth + 1;
+                let x1 = centerX + radius * Math.cos(angle);
+                let y1 = centerY + radius * Math.sin(angle);
+                let x2 = centerX + (radius + barHeight) * Math.cos(angle);
+                let y2 = centerY + (radius + barHeight) * Math.sin(angle);
+
+                let hue = (i / bufferLength) * 360;
+                ctx.strokeStyle = 'hsl(' + hue + ', 100%, 50%)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
             }
         }
 
