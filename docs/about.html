@@ -256,6 +256,42 @@
             opacity: 0;
             pointer-events: none;
         }
+
+        /* MOBILE OPTIMIZATIONS */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2em;
+            }
+            p {
+                font-size: 1em;
+            }
+            .container {
+                padding: 30px;
+            }
+            .button-link {
+                padding: 12px 24px;
+                font-size: 1em;
+            }
+            .audio-controls {
+                top: auto;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                display: flex;
+                align-items: center;
+            }
+            .volume-toggle {
+                width: 45px;
+                height: 45px;
+            }
+            .music-bar {
+                height: 50px;
+                padding: 8px 15px;
+            }
+            .music-bar h2 {
+                font-size: 1.5em;
+            }
+        }
     </style>
 </head>
 <body>
