@@ -213,9 +213,60 @@
             background-color: var(--secondary-color);
             transform: translateY(-3px);
         }
+
+        /* Splash Page Styles */
+        .splash-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #2a3447 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .splash-page h1 {
+            animation: none;
+            opacity: 1;
+        }
+
+        .splash-button {
+            background-color: var(--secondary-color);
+            color: var(--dark-bg);
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 1.5em;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .splash-button:hover {
+            transform: scale(1.05);
+        }
+
+        .fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
+
+    <div class="splash-page" id="splashPage">
+        <h1>Welcome</h1>
+        <button class="splash-button" id="splashButton">
+            Click to Enter
+        </button>
+    </div>
+
     <div class="audio-controls">
         <div class="volume-toggle" id="volumeToggle">
             <i class="fas fa-volume-up"></i>
@@ -254,23 +305,28 @@
 
     <script>
         const backgroundMusic = document.getElementById('backgroundMusic');
+        const splashPage = document.getElementById('splashPage');
+        const splashButton = document.getElementById('splashButton');
+        const mainContent = document.querySelector('.main-content');
         const volumeToggle = document.getElementById('volumeToggle');
         const volumeIcon = volumeToggle.querySelector('i');
         const progressBar = document.getElementById('progressBar');
         const scrollTopBtn = document.getElementById("scrollTopBtn");
 
-        // Autoplay logic
+        // Volume logic, pre-load state
         const isMuted = localStorage.getItem('isMuted') === 'true';
         if (isMuted) {
             backgroundMusic.muted = true;
             volumeToggle.classList.add('muted');
             volumeIcon.classList.remove('fa-volume-up');
             volumeIcon.classList.add('fa-volume-mute');
-        } else {
-            backgroundMusic.play().catch(e => {
-                console.log("Autoplay blocked, user interaction needed to play music.");
-            });
         }
+
+        // Splash screen and autoplay on click
+        splashButton.addEventListener('click', () => {
+            splashPage.classList.add('fade-out');
+            backgroundMusic.play().catch(e => console.log("Audio playback failed:", e));
+        });
 
         // Volume button logic
         volumeToggle.addEventListener('click', () => {
@@ -295,12 +351,9 @@
             progressBar.style.width = progress + '%';
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            document.body.addEventListener('click', () => {
-                if (!backgroundMusic.muted && backgroundMusic.paused) {
-                    backgroundMusic.play().catch(e => console.log("Still can't autoplay after click:", e));
-                }
-            }, { once: true });
+        // Hide splash page if audio is already playing (for browser reloads with audio already playing)
+        backgroundMusic.addEventListener('playing', () => {
+            splashPage.classList.add('fade-out');
         });
         
         // Scroll to top button logic
