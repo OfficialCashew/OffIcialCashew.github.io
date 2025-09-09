@@ -213,40 +213,10 @@
             background-color: var(--secondary-color);
             transform: translateY(-3px);
         }
-
-        .play-pause-toggle {
-            background-color: var(--card-bg);
-            border: 2px solid var(--primary-color);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-            margin-right: 15px;
-        }
-
-        .play-pause-toggle:hover {
-            transform: scale(1.1);
-            border-color: var(--secondary-color);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-        }
-        .play-pause-toggle i {
-            color: var(--light-text);
-            font-size: 1.5em;
-            transition: color 0.3s;
-        }
-
     </style>
 </head>
 <body>
     <div class="audio-controls">
-        <div class="play-pause-toggle" id="playPauseToggle">
-            <i class="fas fa-pause"></i>
-        </div>
         <div class="volume-toggle" id="volumeToggle">
             <i class="fas fa-volume-up"></i>
         </div>
@@ -257,7 +227,9 @@
         <div class="container">
             <h1>About Me</h1>
             <p>
-                Welcome to the 'About' section, where I share insights into my journey and passion for web development.
+                Hey there! My name is Luke, though my girlfriend calls me Lucky.
+                <br><br>
+                I'm a gamer who plays on both the PlayStation 5 and 4. My favorite games are Roblox, Warframe, Genshin Impact, and Need for Speed. My goal is to become a chef in the future, so I can cook delicious meals for my girlfriend. I'm hoping to marry her later on. I'm 15 years old, I'm 5'3" tall, and I plan on living a long, happy life.
             </p>
             <p>
                 Explore my roots on the <a href="index.html" class="button-link">Homepage</a>.
@@ -280,8 +252,6 @@
 
     <script>
         const backgroundMusic = document.getElementById('backgroundMusic');
-        const playPauseToggle = document.getElementById('playPauseToggle');
-        const playPauseIcon = playPauseToggle.querySelector('i');
         const volumeToggle = document.getElementById('volumeToggle');
         const volumeIcon = volumeToggle.querySelector('i');
         const progressBar = document.getElementById('progressBar');
@@ -299,19 +269,6 @@
                 console.log("Autoplay blocked, user interaction needed to play music.");
             });
         }
-
-        // Play/Pause button logic
-        playPauseToggle.addEventListener('click', () => {
-            if (backgroundMusic.paused) {
-                backgroundMusic.play();
-                playPauseIcon.classList.remove('fa-play');
-                playPauseIcon.classList.add('fa-pause');
-            } else {
-                backgroundMusic.pause();
-                playPauseIcon.classList.remove('fa-pause');
-                playPauseIcon.classList.add('fa-play');
-            }
-        });
 
         // Volume button logic
         volumeToggle.addEventListener('click', () => {
