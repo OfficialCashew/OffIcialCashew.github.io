@@ -295,11 +295,14 @@
                 height: 45px;
             }
             .music-bar {
-                height: 50px;
+                height: 100px; /* Adjust height for mobile visualizer */
                 padding: 8px 15px;
             }
             .music-bar h2 {
                 font-size: 1.5em;
+            }
+            .visualizer-container {
+                height: 40px; /* Adjust visualizer height for mobile */
             }
         }
     </style>
@@ -330,9 +333,7 @@
                 <br><br>
                 I'm 15 years old, I'm 5'3" tall, and I plan on living a long, happy life.
             </p>
-            <p>
-                Explore my roots on the <a href="index.html" class="button-link">Homepage</a>.
-            </p>
+            <a href="index.html" class="button-link">Homepage</a>
         </div>
 
         <div class="container">
@@ -374,6 +375,14 @@
         let barWidth;
         let x;
 
+        // Function to resize canvas for responsiveness
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas); // Resize on window resize
+
         function setupVisualizer() {
             if (!audioContext) {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -384,6 +393,7 @@
                 analyser.fftSize = 256;
                 bufferLength = analyser.frequencyBinCount;
                 dataArray = new Uint8Array(bufferLength);
+                resizeCanvas(); // Initial resize when visualizer is set up
             }
         }
 
@@ -391,7 +401,7 @@
             requestAnimationFrame(drawVisualizer);
             analyser.getByteFrequencyData(dataArray);
 
-            ctx.fillStyle = '#1a202c';
+            ctx.fillStyle = 'rgba(26, 32, 44, 0.1)'; // Slightly transparent to show gradient background
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             barWidth = (canvas.width / bufferLength) * 2.5;
